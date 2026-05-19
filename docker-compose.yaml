@@ -1,0 +1,50 @@
+services:
+  api:
+    build:
+      context: ./server/.
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./server/.:/rails # Mount the app code to allow live updates
+    depends_on:
+      - db
+      - redis
+    stdin_open: true  # for `byebug` or `debug`
+    tty: true         # for interactive debugging
+    tmpfs: /rails/tmp
+
+  web:
+    build:
+      context: ./frontend/.
+    volumes:
+      - ./frontend/.:/app # Mount the app code to allow live updates
+      # use node_modules from docker to avoid permission issues
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    stdin_open: true  # for `byebug` or `debug`
+    tty: true         # for interactive debugging
+    tmpfs: /app/tmp
+
+  db:
+    image: postgres:alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql
+  
+  redis:
+    image: redis:alpine
+    restart: always
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local

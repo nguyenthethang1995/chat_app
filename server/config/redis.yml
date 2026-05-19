@@ -1,0 +1,8 @@
+default: &default
+  port: 6379
+  host: <%= ENV.fetch('REDIS_HOST') { 'redis' } %>
+
+development:
+  <<: *default
+production:
+  <<: *default
