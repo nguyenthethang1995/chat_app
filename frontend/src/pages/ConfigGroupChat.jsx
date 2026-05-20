@@ -24,21 +24,31 @@ const ConfigGroupChat = () => {
     }
 
     try {
-      // make API call to create group chat
       if (selectedGroupChat) {
         await updateGroupChat({
           name: groupChat.name,
-          user_group_chats_attributes: groupChat.members,
+          user_group_chats_attributes: [...new Set([...selectedGroupChat.members, ...groupChat.members])].map(member => {
+            
+            const userGroupChatId = selectedGroupChat.user_group_chats[member];
+            console.log('aaa', userGroupChatId);
+            // if the member is new, add it, if not check if it should be kept or destroyed
+            if (!userGroupChatId) {
+              return { user_id: member };
+            }
+            // check if the member is in the updated members list, if yes keep it, if not mark it for destruction
+            const isMember = groupChat.members.includes(member);
+            return isMember ? { id: userGroupChatId, user_id: member } : { id: userGroupChatId, _destroy: true };
+          }),
           avatar: rawSelectedImg
         });
       } else {
-      await createGroupChat({
-        name: groupChat.name,
-        user_group_chats_attributes: [...groupChat.members, authUser.id],
-        created_by_id: authUser.id,
-        avatar: rawSelectedImg,
-      });
-    }
+        await createGroupChat({
+          name: groupChat.name,
+          user_group_chats_attributes: [...groupChat.members, authUser.id],
+          created_by_id: authUser.id,
+          avatar: rawSelectedImg,
+        });
+      }
 
       navigate("/");
     } catch (error) {

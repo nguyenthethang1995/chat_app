@@ -38,6 +38,6 @@ class GroupChatsController < ApplicationController
   private
 
   def group_chat_params
-    params.require(:group_chat).permit(:name, :created_by_id, :avatar, user_group_chats_attributes: [:user_id])
+    params.require(:group_chat).permit(:name, :created_by_id, :avatar, user_group_chats_attributes: [:id, :user_id, :_destroy])
   end
 end

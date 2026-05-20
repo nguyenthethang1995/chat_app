@@ -54,7 +54,15 @@ export const useChatStore = create((set, get) => ({
     const formData = new FormData();
     formData.append("group_chat[name]", groupChatData.name);
     groupChatData.user_group_chats_attributes.forEach((member) => {
-      formData.append(`group_chat[user_group_chats_attributes][][user_id]`, member);
+      if (typeof member === "object" && member._destroy) {
+        formData.append(`group_chat[user_group_chats_attributes][][id]`, member.id);
+        formData.append(`group_chat[user_group_chats_attributes][][_destroy]`, true);
+      } else if (typeof member === "object") {
+        formData.append(`group_chat[user_group_chats_attributes][][id]`, member.id);
+        formData.append(`group_chat[user_group_chats_attributes][][user_id]`, member.user_id);
+      } else {
+        formData.append(`group_chat[user_group_chats_attributes][][user_id]`, member.user_id);
+      }
     });
     if (groupChatData.avatar) {
       formData.append("group_chat[avatar]", groupChatData.avatar);

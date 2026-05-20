@@ -23,6 +23,6 @@ class User < ApplicationRecord
   end
 
   def json_attributes
-    attributes.select { |k, _| k.in? %w[id name email created_at last_seen_at online] }
+    attributes.with_indifferent_access.slice(:id, :name, :email, :created_at, :last_seen_at, :online)
   end
 end

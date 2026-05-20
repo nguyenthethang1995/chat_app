@@ -5,6 +5,9 @@ class Message < ApplicationRecord
   has_many_attached :images
 
   def json_attributes
-    attributes.select { |k, _v| k.in?(%w[id content created_at user_id group_chat_id]) }
+    attributes.with_indifferent_access.slice(:id, :content, :created_at, :user_id, :group_chat_id).merge(
+      group_chat_name: group_chat.name,
+      user_name: user.name,
+    )
   end
 end
